@@ -166,6 +166,16 @@ struct NudgeView: View {
     }
 }
 
+/// The small pet that steps out from behind a nudge and acts it out; it cheers once a glass is logged.
+private struct NudgePetView: View {
+    @ObservedObject var model: NudgeModel
+    let cast: BreakPet.Cast
+
+    var body: some View {
+        BreakPet(groundInset: 6, cast: cast, cheer: model.loggedNote != nil)
+    }
+}
+
 /// Shows posture, water and custom nudges one at a time below the menu bar. No focus is taken;
 /// each fades out on its own, or straight away when clicked. A nudge that arrives while
 /// another is visible waits its turn.
@@ -175,6 +185,8 @@ final class NudgeToastController {
 
     private let model = NudgeModel()
     private var panel: NSPanel?
+    /// The pet beside the nudge, if pets are on.
+    private var petPanel: NSPanel?
     private var dismissWork: DispatchWorkItem?
     private var queue: [NudgeKind] = []
     private let hotKeys = HotKeys()
@@ -244,6 +256,27 @@ final class NudgeToastController {
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary, .ignoresCycle]
         panel.contentView = effect
         panel.alphaValue = 0
+
+        // The pet's window sits just under the nudge's right edge, so the pet walks out from behind it.
+        var petFrame = NSRect.zero
+        if let cast = BreakPet.Cast(choice: BreakPet.choice, nudge: kind) {
+            petFrame = NSRect(x: finalFrame.maxX - 10, y: finalFrame.minY, width: 130, height: max(size.height, 70) + 6)
+            let pet = NSPanel(contentRect: petFrame.offsetBy(dx: 0, dy: 12),
+                              styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
+            pet.isOpaque = false
+            pet.backgroundColor = .clear
+            pet.hasShadow = false
+            pet.ignoresMouseEvents = true
+            pet.level = .statusBar
+            pet.hidesOnDeactivate = false
+            pet.isReleasedWhenClosed = false
+            pet.collectionBehavior = panel.collectionBehavior
+            pet.contentView = NSHostingView(rootView: NudgePetView(model: model, cast: cast))
+            pet.alphaValue = 0
+            pet.orderFrontRegardless()
+            petPanel = pet
+        }
+
         panel.orderFrontRegardless()
         self.panel = panel
 
@@ -256,6 +289,8 @@ final class NudgeToastController {
             ctx.timingFunction = CAMediaTimingFunction(name: .easeOut)
             panel.animator().alphaValue = 1
             panel.animator().setFrame(finalFrame, display: true)
+            petPanel?.animator().alphaValue = 1
+            petPanel?.animator().setFrame(petFrame, display: true)
         }
         withAnimation(.linear(duration: kind.duration)) { model.progress = 0 }
         scheduleDismiss(after: kind.duration)
@@ -284,16 +319,20 @@ final class NudgeToastController {
         hotKeys.unregisterAll()
         guard let panel else { return }
         self.panel = nil
+        let pet = petPanel
+        petPanel = nil
         let showNext = { [weak self] in
             guard next, let self, self.panel == nil, !self.queue.isEmpty else { return }
             self.present(self.queue.removeFirst())
         }
-        guard animated else { panel.orderOut(nil); showNext(); return }
+        guard animated else { panel.orderOut(nil); pet?.orderOut(nil); showNext(); return }
         NSAnimationContext.runAnimationGroup({ ctx in
             ctx.duration = 0.3
             panel.animator().alphaValue = 0
+            pet?.animator().alphaValue = 0
         }, completionHandler: {
             panel.orderOut(nil)
+            pet?.orderOut(nil)
             // Small gap so two nudges don't look like one flickering popup.
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6, execute: showNext)
         })

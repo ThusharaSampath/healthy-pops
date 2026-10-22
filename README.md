@@ -6,7 +6,7 @@
 
 <p align="center">
   <b>Tiny popups that keep you healthy at your Mac.</b><br>
-  Eye breaks, water, posture and your own reminders. Free forever, open source.
+  Eye breaks, water, posture and your own reminders, with a cat or dog to keep you company. Free forever, open source.
 </p>
 
 <p align="center">
@@ -34,8 +34,14 @@
 | 💧 **Water** | A silly nudge every hour. Log a glass with <kbd>⌃⌥W</kbd>. |
 | 🧍 **Posture** | Five seconds, one cheeky line, gone. |
 | ✨ **Your own popups** | Pick a title, icon, colour and interval in a keyboard-first editor. |
+| 🐾 **Break pets** | Cats and dogs take turns turning up during eye breaks to do one cute thing: nap, sit in a box, chase a laser dot, get the zoomies, howl, dig for a bone. Seven cats, eight dogs, four ways in, never the same twice in a row. |
+| 🥣 **Pets on reminders** | A small pet steps out from behind your reminders and acts them out: laps from a water bowl (and cheers when you log a glass), sits up tall for posture, waves for your own popups. |
 
-Every popup counts **real screen time** (lock, sleep or walk away and it starts over), **waits while you're in a call**, and can be tuned or switched off from the menu bar. No account, no network, no permissions. Native Swift, under 1 MB.
+<p align="center">
+  <img src="docs/break-pets.jpg" alt="Break pets: a corgi with the zoomies, a cat in a box, a howling husky, a cat chasing a laser dot and a beagle that found a bone">
+</p>
+
+Every popup counts **real screen time** (lock, sleep or walk away and it starts over), **waits while you're in a call**, and can be tuned or switched off from the menu bar. Pick **Cats & Dogs**, **Cats**, **Dogs** or **Off** under **Break Pet**. No account, no network, no permissions. Native Swift, under 1 MB.
 
 ## Install
 
@@ -55,7 +61,7 @@ Needs Swift 5.9+ (Xcode or Command Line Tools). Run with `HEALTHYPOPS_DEBUG=1` f
 
 ## Contributing
 
-PRs are very welcome: funnier messages (`Sources/HealthyPops/NudgeToast.swift`), new built-in popups, fixes and ideas. Pushing a `v*` tag builds a universal DMG, publishes the release and deploys the website.
+PRs are very welcome: funnier messages (`Sources/HealthyPops/NudgeToast.swift`), new built-in popups, new pet activities (`Sources/HealthyPops/PetShow.swift`) or coats and breeds (`Sources/HealthyPops/PetFigure.swift`), fixes and ideas. Pushing a `v*` tag builds a universal DMG, publishes the release and deploys the website.
 
 ## License
 
